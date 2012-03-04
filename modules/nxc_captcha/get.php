@@ -18,10 +18,15 @@ if( $attribute instanceof eZContentClassAttribute === false ) {
 	eZExecution::cleanExit();
 }
 
-foreach( nxcCaptchaType::$definition as $option => $info ) {
-	if( $attribute->hasAttribute( $info['field'] ) ) {
-		$params[ $option ] = $attribute->attribute( $info['field'] );
+$content = $attribute->attribute( 'content' );
+$params  = array();
+foreach( $content as $option => $info ) {
+	if( isset( $info['value'] ) ) {
+		$params[ $option ] = $info['value'];
 	}
+}
+if( isset( $params['exclude_characters'] ) ) {
+	$params['exclude_characters'] = explode( ',', $params['exclude_characters'] );
 }
 
 $captcha = new nxcCaptcha(

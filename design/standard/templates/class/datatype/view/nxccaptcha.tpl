@@ -14,6 +14,10 @@
 			{if eq( $type_id, $content.type.value )}<p>{$type}</p>{/if}
 			{/foreach}
 		</div>
+		<div class="element">
+			<label>{'Exclude characters'|i18n( 'extension/nxc_captcha' )}:</label>
+			<p>{$content.exclude_characters.value}</p>
+		</div>
 		<div class="clear"></div>
 	</div>
 

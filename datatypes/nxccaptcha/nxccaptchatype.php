@@ -50,26 +50,39 @@ class nxcCaptchaType extends eZDataType
 			'default' => 15
 		),
 		'characters_color' => array(
-			'field'   => 'data_text1',
+			'field'   => array(
+				'field' => 'data_text5',
+				'index' => 'chracters'
+			),
 			'default' => 'ffffff'
 		),
 		'background_color' => array(
-			'field'   => 'data_text2',
+			'field'   => array(
+				'field' => 'data_text5',
+				'index' => 'background'
+			),
 			'default' => '0063ff'
 		),
 		'noise_color' => array(
-			'field'   => 'data_text3',
+			'field'   => array(
+				'field' => 'data_text5',
+				'index' => 'noise'
+			),
 			'default' => '42ccff'
 		),
 		'skip_user_ids' => array(
-			'field'   => 'data_text4',
+			'field'   => 'data_text1',
 			'default' => 14
 		),
 		'skip_role_ids' => array(
-			'field'           => 'data_text5',
+			'field'           => 'data_text2',
 			'default'         => 2,
 			'possible_values' => array()
-		)
+		),
+		'exclude_characters' => array(
+			'field'    => 'data_text3',
+			'default' => '0,o,O,l,I,i'
+		),
 	);
 
 	public function __construct() {
@@ -102,11 +115,19 @@ class nxcCaptchaType extends eZDataType
 
 	public function initializeClassAttribute( $classAttribute ) {
 		if( $classAttribute->attribute( 'id' ) === null ) {
+			$fields = array();
 			foreach( self::$definition as $option => $info ) {
-				if( $classAttribute->hasAttribute( $info['field'] ) ) {
-					$classAttribute->setAttribute( $info['field'], $info['default'] );
+				if( is_array( $info['field'] ) ) {
+					$fieldDef = $info['field'];
+					if( isset( $fields[ $fieldDef['field'] ] ) === false ) {
+						$fields[ $fieldDef['field'] ] = array();
+					}
+					$fields[ $fieldDef['field'] ][ $fieldDef['index'] ] = $info['default'];
+				} else {
+					$fields[ $info['field'] ] = $info['default'];
 				}
 			}
+			self::setClassAttributeFields( $classAttribute, $fields );
 		}
 	}
 
@@ -124,18 +145,27 @@ class nxcCaptchaType extends eZDataType
 				$input['skip_role_ids'] = array();
 			}
 
+			$fileds = array();
 			foreach( self::$definition as $option => $info ) {
-				if(
-					$classAttribute->hasAttribute( $info['field'] )
-					&& isset( $input[ $option ] )
-				) {
+				if( isset( $input[ $option ] ) ) {
 					$value = $input[ $option ];
 					if( is_array( $value ) ) {
 						$value = implode( ',', $value );
 					}
-					$classAttribute->setAttribute( $info['field'], $value );
+
+					if( is_array( $info['field'] ) ) {
+						$fieldDef = $info['field'];
+						if( isset( $fields[ $fieldDef['field'] ] ) === false ) {
+							$fields[ $fieldDef['field'] ] = array();
+						}
+						$fields[ $fieldDef['field'] ][ $fieldDef['index'] ] = $value;
+					} else {
+						$fields[ $info['field'] ] = $value;
+					}
 				}
 			}
+
+			self::setClassAttributeFields( $classAttribute, $fields );
 		}
 	}
 
@@ -200,11 +230,33 @@ class nxcCaptchaType extends eZDataType
 	}
 
 	public function classAttributeContent( $classAttribute ) {
+		$fields = array();
+		foreach( self::$definition as $option => $info ) {
+			if( is_array( $info['field'] ) ) {
+				$field = $info['field']['field'];
+				$value = $classAttribute->attribute( $field );
+				$value = unserialize( $value );
+			} else {
+				$field = $info['field'];
+				$value = $classAttribute->attribute( $field );
+			}
+			$fields[ $field ] = $value;
+		}
+
 		$options = self::$definition;
 		foreach( $options as $option => $info ) {
 			$value = null;
-			if( $classAttribute->hasAttribute( $info['field'] ) ) {
-				$value = $classAttribute->attribute( $info['field'] );
+			if( is_array( $info['field'] ) ) {
+				if( isset( $fields[ $info['field']['field'] ] ) ) {
+					$values = $fields[ $info['field']['field'] ];
+					if( isset( $values[ $info['field']['index'] ] ) ) {
+						$value = $values[ $info['field']['index'] ];
+					}
+				}
+			} else {
+				if( isset( $fields[ $info['field'] ] ) ) {
+					$value = $fields[ $info['field'] ];
+				}
 			}
 			$options[ $option ]['value'] = $value;
 		}
@@ -296,32 +348,39 @@ class nxcCaptchaType extends eZDataType
 		$classAttribute, $attributeNode, $attributeParametersNode
 	) {
 		$dom = $attributeParametersNode->ownerDocument;
+		$content = $classAttribute->attribute( 'content' );
 
-		foreach( self::$definition as $option => $info ) {
-			if( $classAttribute->hasAttribute( $info['field'] ) ) {
-				$node = $dom->createElement(
-					$option,
-					$classAttribute->attribute( $info['field'] )
-				);
-				$attributeParametersNode->appendChild( $node );
-			}
+		foreach( $content as $option => $info ) {
+			$value = is_array( $info['value'] )
+				? implode( ',', $info['value'] )
+				: $info['value'];
+			$node  = $dom->createElement( $option, $value );
+			$attributeParametersNode->appendChild( $node );
 		}
 	}
 
 	public function unserializeContentClassAttribute(
 		$classAttribute, $attributeNode, $attributeParametersNode
 	) {
+		$fileds = array();
 		foreach( self::$definition as $option => $info ) {
-			if( $classAttribute->hasAttribute( $info['field'] ) ) {
-				$nodes = $attributeParametersNode->getElementsByTagName( $option );
-				if( (int) $nodes->length > 0 ) {
-					$classAttribute->setAttribute(
-						$info['field'],
-						$nodes->item( 0 )->textContent
-					);
+			$nodes = $attributeParametersNode->getElementsByTagName( $option );
+			if( (int) $nodes->length > 0 ) {
+				$value = $nodes->item( 0 )->textContent;
+
+				if( is_array( $info['field'] ) ) {
+					$fieldDef = $info['field'];
+					if( isset( $fields[ $fieldDef['field'] ] ) === false ) {
+						$fields[ $fieldDef['field'] ] = array();
+					}
+					$fields[ $fieldDef['field'] ][ $fieldDef['index'] ] = $value;
+				} else {
+					$fields[ $info['field'] ] = $value;
 				}
 			}
 		}
+
+		self::setClassAttributeFields( $classAttribute, $fields );
 	}
 
 	public function objectAttributeContent( $attribute ) {
@@ -521,6 +580,17 @@ class nxcCaptchaType extends eZDataType
 
 	public function diff( $old, $new, $options = false ) {
 		return null;
+	}
+
+	private static function setClassAttributeFields( $classAttribute, $fields ) {
+		foreach( $fields as $field => $value ) {
+			if( $classAttribute->hasAttribute( $field ) ) {
+				$classAttribute->setAttribute(
+					$field,
+					is_array( $value ) ? serialize( $value ) : $value
+				);
+			}
+		}
 	}
 }
 

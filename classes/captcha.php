@@ -131,6 +131,17 @@ class nxcCaptcha
 			$http->sessionVariable( $this->sessionKey ) === null
 		) {
 			$charsTable = $this->getCharacterTable();
+			if(
+				isset( $this->params['exclude_characters'] )
+				&& is_array( $this->params['exclude_characters'] )
+			) {
+				foreach( $this->params['exclude_characters'] as $char ) {
+					$key = array_search( trim( $char ), $charsTable );
+					if( $key !== false ) {
+						unset( $charsTable[ $key ] );
+					}
+				}
+			}
 
 			$text   = null;
 			$length = (int) $this->getParameter( 'length' );

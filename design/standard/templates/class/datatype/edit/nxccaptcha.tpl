@@ -83,6 +83,13 @@
 			</select>
 		</div>
 
+		<div class="nxc-captcha-property-block">
+			<label>{'Exclude characters (separated by comma)'|i18n( 'extension/nxc_captcha' )}:</label>
+			<div>
+			<input type="text" name="nxc_captcha_{$class_attribute.id}_options[exclude_characters]" value="{$content.exclude_characters.value}" size="64" />
+			</div>
+		</div>
+
 	</fieldset>
 </div>
 
