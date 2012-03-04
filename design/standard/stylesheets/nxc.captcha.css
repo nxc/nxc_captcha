@@ -1,0 +1,63 @@
+div.nxc-captcha-property-block {
+	margin: 15px 0;
+}
+
+div.nxc-captcha-property-block label,
+div.nxc-captcha-property-block span.nxc-captcha-slider-value,
+div.nxc-captcha-color-block label
+{
+	display: inline-block;
+}
+
+div.nxc-captcha-slider {
+	width: 400px;
+	margin: 5px 0 0;
+}
+
+div.nxc-captcha-color-block label {
+	margin: 10px 0px 0px 0px;
+}
+
+div.nxc-captcha-color-selector,
+div.nxc-captcha-color-selector-disabled {
+	position: relative;
+	width: 36px;
+	height: 36px;
+	background: url(../images/colorpicker/select.png);
+}
+div.nxc-captcha-color-selector div.nxc-captcha-color-selector-bg,
+div.nxc-captcha-color-selector-disabled div.nxc-captcha-color-selector-bg {
+	position: absolute;
+	top: 3px;
+	left: 3px;
+	width: 30px;
+	height: 30px;
+	background: url(../images/colorpicker/select.png) center;
+}
+
+a.nxc-captcha-regenerate {
+	display: none;
+}
+div.clear {
+	clear: both;
+	line-height: 0;
+	height: 0;
+}
+div.nxc-captcha-tip {
+	color: #666666;
+    display: inline;
+    font-size: 11px;
+}
+div.nxc-captcha-color-block label {
+	width: auto;
+}
+div.captcha_view div.block div.element {
+	 padding-right: 50px;
+}
+div.ezcca-edit-nxc_captcha input {
+	display: block;
+	margin-top: 10px;
+}
+div.ezcca-edit-nxc_captcha input.captcha-input {
+	display: inline;
+}
