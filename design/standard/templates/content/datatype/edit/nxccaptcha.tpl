@@ -9,8 +9,8 @@
 	<p>
 		<input class="captcha-input" id="nxc-captcha-input-{$attribute.id}" type="text" name="nxc_captcha_{$attribute.id}" value="{$attribute.data_text}" size="{$class_content.length.value}" maxlength="{$class_content.length.value}" />
 		<a href="{concat( 'nxc_captcha/get/', $attribute.contentclass_attribute.id, '/nxc_captcha_object_attribute_', $attribute.id, '/1' )|ezurl( 'no' )}" class="nxc-captcha-regenerate" id="nxc-captcha-regenerate-{$attribute.id}">{'Regenerate'|i18n( 'extension/nxc_captcha' )}</a>
-	{else}
 	</p>
+{else}
 	<p>{'Secure code is allready entered'|i18n( 'extension/nxc_captcha' )}</p>
 {/if}
 
