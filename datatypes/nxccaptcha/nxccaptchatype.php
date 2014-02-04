@@ -539,6 +539,10 @@ class nxcCaptchaType extends eZDataType
 				return eZInputValidator::STATE_INVALID;
 			}
 		}
+		
+		if ($attribute->attribute('is_required') == 0 ) {		
+			return eZInputValidator::STATE_ACCEPTED;
+		}
 
 		$attribute->setValidationError(
 			ezpI18n::tr( 'extension/nxc_captcha', 'Secure code is missing.' )
