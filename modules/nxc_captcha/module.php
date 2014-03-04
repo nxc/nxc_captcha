@@ -12,7 +12,7 @@ $Module = array(
 
 $ViewList = array(
 	'get' => array(
-		'functions' => array( 'get' ),
+		'functions' => array( 'view' ),
 		'script'    => 'get.php',
 		'params'    => array(
 			'classAttributeID',
