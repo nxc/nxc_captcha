@@ -37,7 +37,7 @@ if ($Params['classAttributeID'] == -1 ) {
 			'Can`t fetch class attribute (ID: %id)',
 			null,
 			array(
-				'%id' => $Params['classAttributeID']
+				'%id' => htmlspecialchars( $Params['classAttributeID'], ENT_QUOTES, 'UTF-8' )
 			)
 		);
 		eZExecution::cleanExit();
