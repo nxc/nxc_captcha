@@ -172,7 +172,11 @@ class nxcCaptcha
 	public function output() {
 		header( 'Content-Type: image/gif' );
 		header( 'Cache-Control: no-cache, must-revalidate' );
-		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header('Pragma-directive: no-cache');
+		header('Cache-directive: no-cache');
+		header('Pragma: no-cache');
+		header('Expires: 0');
+
 		imagegif( $this->image );
 		imagedestroy( $this->image );
 	}
