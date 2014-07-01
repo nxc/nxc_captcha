@@ -12,7 +12,6 @@
  **/
  
 $params  = array();
-
 if ($Params['classAttributeID'] == -1 ) {
 	// Generate from INI Defaults
 	$ini = eZINI::instance( 'nxc_captcha.ini' );
